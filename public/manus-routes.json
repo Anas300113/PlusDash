@@ -1,0 +1,10 @@
+{
+  "routes": [
+    { "path": "/", "title": "Today" },
+    { "path": "/learn", "title": "Learn" },
+    { "path": "/learn/:subject", "title": "Subject topics" },
+    { "path": "/progress", "title": "Progress" },
+    { "path": "/review", "title": "Review" },
+    { "path": "/practice", "title": "Practice" }
+  ]
+}
