@@ -1,9 +1,9 @@
 "use client";
 
-export function DailyRing({ value, label }: { value: number; label: string }) {
+export function DailyRing({ value, label, minutes = 18, target = 30 }: { value: number; label: string; minutes?: number; target?: number }) {
   const radius = 31;
   const circumference = 2 * Math.PI * radius;
-  const dash = circumference * value / 100;
+  const dash = circumference * Math.min(100, Math.max(0, value)) / 100;
 
   return (
     <div className="daily-ring" role="img" aria-label={label}>
@@ -19,8 +19,8 @@ export function DailyRing({ value, label }: { value: number; label: string }) {
         />
       </svg>
       <span className="ring-center">
-        <strong>18</strong>
-        <small>of 30 min</small>
+        <strong>{minutes}</strong>
+        <small>of {target} min</small>
       </span>
     </div>
   );

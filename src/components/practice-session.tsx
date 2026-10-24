@@ -5,277 +5,219 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, Clock3, Lightbulb, X } from "lucide-react";
+import { ArrowRight, Check, Clock3, Lightbulb, LoaderCircle, X } from "lucide-react";
+import { useSession } from "@/components/session-provider";
+import { apiWrite } from "@/lib/client-api";
+import { getQuestionForTopicAt, getQuestionsForTopic, isSupportedSubject, isSupportedTopic, type PracticeQuestion } from "@/lib/questions";
 
-type Question = {
-  subject: string;
-  prompt: string;
-  support: string;
-  hint: string;
-  options: { letter: string; text: string }[];
-  answer: string;
-  explanation: string;
-};
-
-const verbalQuestions: Question[] = [
-  {
-    subject: "Verbal reasoning, odd one out",
-    prompt: "Which word is the odd one out?",
-    support: "Think about what the others have in common.",
-    hint: "Three of these instruments make sound with vibrating strings.",
-    options: [
-      { letter: "A", text: "Violin" },
-      { letter: "B", text: "Trumpet" },
-      { letter: "C", text: "Cello" },
-      { letter: "D", text: "Harp" },
-    ],
-    answer: "B",
-    explanation: "Violin, cello, and harp are string instruments. A trumpet is a brass instrument, so it is the odd one out.",
-  },
-  {
-    subject: "Verbal reasoning, word links",
-    prompt: "Which word completes the pair?",
-    support: "Bird is to nest as bee is to …",
-    hint: "Think of the place where a group of bees lives.",
-    options: [
-      { letter: "A", text: "Hive" },
-      { letter: "B", text: "Web" },
-      { letter: "C", text: "Burrow" },
-      { letter: "D", text: "Den" },
-    ],
-    answer: "A",
-    explanation: "A bird lives in a nest and a group of bees lives in a hive.",
-  },
-  {
-    subject: "Verbal reasoning, letter sequences",
-    prompt: "What letter comes next?",
-    support: "A, C, E, G, …",
-    hint: "Count how many letters you skip each time.",
-    options: [
-      { letter: "A", text: "H" },
-      { letter: "B", text: "I" },
-      { letter: "C", text: "J" },
-      { letter: "D", text: "K" },
-    ],
-    answer: "B",
-    explanation: "The sequence skips one letter each time: A, C, E, G, then I.",
-  },
-  {
-    subject: "Verbal reasoning, word meaning",
-    prompt: "Which word means the opposite of ‘ancient’?",
-    support: "Look for a word that describes something very new.",
-    hint: "This word can describe a newly built house.",
-    options: [
-      { letter: "A", text: "Old" },
-      { letter: "B", text: "Modern" },
-      { letter: "C", text: "Historic" },
-      { letter: "D", text: "Earlier" },
-    ],
-    answer: "B",
-    explanation: "Modern means recent or up to date, so it is the opposite of ancient.",
-  },
-];
-
-const rotationQuestions: Question[] = [
-  {
-    subject: "Non-verbal reasoning, rotations",
-    prompt: "A shape turns a quarter turn clockwise. How far has it turned?",
-    support: "A full turn is 360 degrees.",
-    hint: "A quarter is one of four equal parts of a full turn.",
-    options: [
-      { letter: "A", text: "45 degrees" },
-      { letter: "B", text: "90 degrees" },
-      { letter: "C", text: "180 degrees" },
-      { letter: "D", text: "360 degrees" },
-    ],
-    answer: "B",
-    explanation: "A quarter turn is one of four equal parts of a full 360-degree turn: 360 ÷ 4 = 90 degrees.",
-  },
-  {
-    subject: "Non-verbal reasoning, shape sequences",
-    prompt: "A pattern goes circle, diamond, circle, diamond. What comes next?",
-    support: "Look for the part of the pattern that repeats.",
-    hint: "The two shapes take turns appearing.",
-    options: [{ letter: "A", text: "Circle" }, { letter: "B", text: "Diamond" }, { letter: "C", text: "Triangle" }, { letter: "D", text: "Square" }],
-    answer: "A",
-    explanation: "The pattern alternates between a circle and a diamond, so the next shape is a circle.",
-  },
-  {
-    subject: "Non-verbal reasoning, reflections",
-    prompt: "A left-pointing arrow is reflected in a vertical mirror. Which way does it point?",
-    support: "A reflection flips the image across the mirror line.",
-    hint: "Imagine the arrow facing its mirror image.",
-    options: [{ letter: "A", text: "Left" }, { letter: "B", text: "Right" }, { letter: "C", text: "Up" }, { letter: "D", text: "Down" }],
-    answer: "B",
-    explanation: "A vertical mirror flips left and right, so the reflected arrow points right.",
-  },
-  {
-    subject: "Non-verbal reasoning, missing shapes",
-    prompt: "Which shape completes the pattern? Circle, diamond, circle, diamond, …",
-    support: "Check which two shapes alternate.",
-    hint: "The first and third shapes match.",
-    options: [{ letter: "A", text: "Diamond" }, { letter: "B", text: "Circle" }, { letter: "C", text: "Square" }, { letter: "D", text: "Triangle" }],
-    answer: "B",
-    explanation: "Circle and diamond alternate, so a circle comes next.",
-  },
-];
-
-const mathsQuestions: Question[] = [
-  {
-    subject: "Maths, fractions",
-    prompt: "What is 1/2 + 1/4?",
-    support: "Try giving both fractions the same denominator.",
-    hint: "One half is the same as two quarters.",
-    options: [
-      { letter: "A", text: "2/6" },
-      { letter: "B", text: "3/4" },
-      { letter: "C", text: "1/6" },
-      { letter: "D", text: "2/4" },
-    ],
-    answer: "B",
-    explanation: "One half is 2/4. Then 2/4 + 1/4 = 3/4.",
-  },
-  {
-    subject: "Maths, number sequences",
-    prompt: "What number comes next?",
-    support: "6, 9, 12, …",
-    hint: "Compare each number with the one before it.",
-    options: [{ letter: "A", text: "13" }, { letter: "B", text: "14" }, { letter: "C", text: "15" }, { letter: "D", text: "16" }],
-    answer: "C",
-    explanation: "The sequence adds 3 each time, so 12 + 3 = 15.",
-  },
-  {
-    subject: "Maths, ratio and proportion",
-    prompt: "Red and blue counters are in the ratio 2:3. If there are 4 red counters, how many blue counters are there?",
-    support: "The red amount has doubled from 2 to 4.",
-    hint: "Keep the same scale for the blue amount too.",
-    options: [{ letter: "A", text: "4" }, { letter: "B", text: "5" }, { letter: "C", text: "6" }, { letter: "D", text: "8" }],
-    answer: "C",
-    explanation: "The red amount doubled, so double 3 blue counters as well: 3 × 2 = 6.",
-  },
-  {
-    subject: "Maths, area and perimeter",
-    prompt: "A rectangle is 5 cm long and 3 cm wide. What is its perimeter?",
-    support: "Perimeter is the distance all the way around the shape.",
-    hint: "Add all four sides: 5 + 3 + 5 + 3.",
-    options: [{ letter: "A", text: "8 cm" }, { letter: "B", text: "13 cm" }, { letter: "C", text: "15 cm" }, { letter: "D", text: "16 cm" }],
-    answer: "D",
-    explanation: "A rectangle has two sides of each length: 5 + 3 + 5 + 3 = 16 cm.",
-  },
-];
-
-const englishQuestions: Question[] = [
-  {
-    subject: "English, vocabulary",
-    prompt: "Which word means the opposite of ‘ancient’?",
-    support: "Look for a word that describes something very new.",
-    hint: "This word can describe a newly built house.",
-    options: [
-      { letter: "A", text: "Old" },
-      { letter: "B", text: "Modern" },
-      { letter: "C", text: "Historic" },
-      { letter: "D", text: "Earlier" },
-    ],
-    answer: "B",
-    explanation: "Modern means recent or up to date, so it is the opposite of ancient.",
-  },
-  {
-    subject: "English, comprehension",
-    prompt: "Mia hurried indoors when the first drops fell. What was the weather doing?",
-    support: "Use the clue in the sentence to work it out.",
-    hint: "The word ‘drops’ tells you what was falling.",
-    options: [{ letter: "A", text: "It was starting to rain" }, { letter: "B", text: "The wind had stopped" }, { letter: "C", text: "It was getting warmer" }, { letter: "D", text: "It had started to snow" }],
-    answer: "A",
-    explanation: "The first drops falling suggest that it was beginning to rain.",
-  },
-  {
-    subject: "English, spelling patterns",
-    prompt: "Which word is spelled correctly?",
-    support: "Look closely at the letters in each choice.",
-    hint: "The word has one ‘c’ and two ‘s’ letters.",
-    options: [{ letter: "A", text: "Neccessary" }, { letter: "B", text: "Necesary" }, { letter: "C", text: "Necessary" }, { letter: "D", text: "Necessay" }],
-    answer: "C",
-    explanation: "Necessary is spelled n-e-c-e-s-s-a-r-y.",
-  },
-  {
-    subject: "English, sentence meaning",
-    prompt: "If someone feels ‘under the weather’, how are they probably feeling?",
-    support: "This phrase has a meaning beyond the words themselves.",
-    hint: "It’s a gentle way to say they don’t feel well.",
-    options: [{ letter: "A", text: "Excited" }, { letter: "B", text: "Unwell" }, { letter: "C", text: "Sleepy" }, { letter: "D", text: "Proud" }],
-    answer: "B",
-    explanation: "‘Under the weather’ is an expression that means feeling a little unwell.",
-  },
-];
-
-const questionSets: Record<string, Question[]> = {
-  maths: mathsQuestions,
-  english: englishQuestions,
-  "verbal-reasoning": verbalQuestions,
-  "non-verbal-reasoning": rotationQuestions,
-};
-
-const topicPositions: Record<string, Record<string, number>> = {
-  maths: { fractions: 0, "number-sequences": 1, "ratio-and-proportion": 2, "area-and-perimeter": 3 },
-  english: { vocabulary: 0, comprehension: 1, "spelling-patterns": 2, "sentence-meaning": 3 },
-  "verbal-reasoning": { "odd-one-out": 0, "word-links": 1, "letter-sequences": 2, "code-words": 3 },
-  "non-verbal-reasoning": { rotations: 0, "shape-sequences": 1, reflections: 2, "missing-shapes": 3 },
-};
+type SessionResult = { sessionId: string; subjectId: string; topicId: string; questionIndex: number; totalQuestions: number; status: string };
+type AnswerResult = { isCorrect: boolean; questionIndex?: number; explanation?: string | null };
 
 function formatTime(seconds: number) {
-  const minutes = Math.floor(seconds / 60);
-  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function defaultTopic(subjectId: string) {
+  switch (subjectId) {
+    case "maths": return "fractions";
+    case "english": return "vocabulary";
+    case "non-verbal-reasoning": return "rotations";
+    default: return "odd-one-out";
+  }
 }
 
 export function PracticeSession() {
   const searchParams = useSearchParams();
-  const selectedSubject = searchParams.get("subject") ?? "verbal-reasoning";
-  const selectedTopic = searchParams.get("topic") ?? "";
-  const baseQuestions = questionSets[selectedSubject] ?? verbalQuestions;
-  const startIndex = topicPositions[selectedSubject]?.[selectedTopic] ?? 0;
-  const questionSet = [...baseQuestions.slice(startIndex), ...baseQuestions.slice(0, startIndex)];
+  const { status, csrfToken, refresh: refreshSession } = useSession();
+  const requestedSubject = searchParams.get("subject") ?? "verbal-reasoning";
+  const requestedTopic = searchParams.get("topic") ?? "odd-one-out";
+  const subjectId = isSupportedSubject(requestedSubject) ? requestedSubject : "verbal-reasoning";
+  const topicId = isSupportedTopic(subjectId, requestedTopic) ? requestedTopic : defaultTopic(subjectId);
+  const sessionKey = `${subjectId}:${topicId}`;
+  const questionSet = getQuestionsForTopic(subjectId, topicId);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [hintVisible, setHintVisible] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [elapsed, setElapsed] = useState(42);
+  const [answerCorrect, setAnswerCorrect] = useState(false);
+  const [answerExplanation, setAnswerExplanation] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [answerError, setAnswerError] = useState<string | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const [guestElapsed, setGuestElapsed] = useState(42);
   const [complete, setComplete] = useState(false);
+  const [sessionState, setSessionState] = useState<"idle" | "starting" | "ready" | "error">("idle");
+  const [readySessionKey, setReadySessionKey] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+  const [sessionErrorKey, setSessionErrorKey] = useState<string | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const answerRequestRef = useRef<string | null>(null);
+  const sessionRequestRef = useRef<{ key: string; promise: Promise<SessionResult> } | null>(null);
   const reduceMotion = useReducedMotion();
-  const current = questionSet[questionIndex];
-  const step = 5 + questionIndex;
-  const isCorrect = selected === current.answer;
+  const signedIn = status === "authenticated";
+  const requestKey = `${csrfToken ?? "guest"}:${sessionKey}:${retryCount}`;
+  const sessionReady = !signedIn || (sessionState === "ready" && readySessionKey === requestKey);
+  const sessionStartError = signedIn && sessionState === "error" && sessionErrorKey === requestKey ? sessionError : null;
+  const activeQuestionIndex = signedIn && sessionReady ? questionIndex : signedIn ? 0 : questionIndex;
+  const current: PracticeQuestion = getQuestionForTopicAt(subjectId, topicId, activeQuestionIndex) ?? questionSet[0];
+  const step = signedIn ? activeQuestionIndex + 1 : 5 + activeQuestionIndex;
 
   useEffect(() => {
+    if (status !== "authenticated" || !csrfToken) return;
+    let active = true;
+
+    if (!sessionRequestRef.current || sessionRequestRef.current.key !== requestKey) {
+      sessionRequestRef.current = {
+        key: requestKey,
+        promise: apiWrite<SessionResult>("/api/learner/practice/sessions", csrfToken, "POST", {
+          subjectId,
+          topicId,
+          idempotencyKey: crypto.randomUUID(),
+        }),
+      };
+    }
+
+    void sessionRequestRef.current.promise.then(async (result) => {
+      if (!active) return;
+      setSessionId(result.sessionId);
+      setQuestionIndex(result.questionIndex);
+      setSessionState("ready");
+      setReadySessionKey(requestKey);
+      setSessionError(null);
+      setSessionErrorKey(null);
+      setCompletionError(null);
+      setComplete(false);
+      setSelected(null);
+      setSubmitted(false);
+      setAnswerCorrect(false);
+      setAnswerExplanation(null);
+      setHintVisible(false);
+      setAnswerError(null);
+      setElapsed(0);
+      setGuestElapsed(42);
+      answerRequestRef.current = null;
+      if (result.questionIndex >= result.totalQuestions || result.status === "completed") {
+        try {
+          await apiWrite(`/api/learner/practice/sessions/${encodeURIComponent(result.sessionId)}/complete`, csrfToken, "POST", {});
+          if (active) { setComplete(true); await refreshSession(); }
+        } catch (reason) {
+          if (active) setCompletionError(reason instanceof Error ? reason.message : "We couldn’t finish saving your session.");
+        }
+      }
+    }).catch((reason: unknown) => {
+      if (active) {
+        setSessionState("error");
+        setSessionError(reason instanceof Error ? reason.message : "We couldn’t start practice just now.");
+        setSessionErrorKey(requestKey);
+      }
+    });
+    return () => { active = false; };
+  }, [status, csrfToken, requestKey, sessionKey, retryCount, refreshSession, subjectId, topicId]);
+
+  useEffect(() => {
+    if (status !== "guest" && !sessionReady) return;
     if (submitted || complete) return;
-    const timer = window.setInterval(() => setElapsed((seconds) => seconds + 1), 1000);
+    const timer = window.setInterval(() => {
+      if (status === "guest") setGuestElapsed((seconds) => seconds + 1);
+      else setElapsed((seconds) => seconds + 1);
+    }, 1000);
     return () => window.clearInterval(timer);
-  }, [submitted, complete, questionIndex]);
+  }, [status, sessionReady, submitted, complete, activeQuestionIndex]);
 
   useEffect(() => {
     if (submitted) feedbackRef.current?.focus();
   }, [submitted]);
 
-  function checkAnswer() {
-    if (!selected) return;
-    setSubmitted(true);
+  async function checkAnswer() {
+    if (!selected || submitted || isSubmitting) return;
+    setAnswerError(null);
+    if (signedIn && (!csrfToken || !sessionId)) {
+      setAnswerError("Your practice session isn’t ready yet. Please wait a moment and try again.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      let result: AnswerResult;
+      if (signedIn && csrfToken && sessionId) {
+        const idempotencyKey = answerRequestRef.current ?? crypto.randomUUID();
+        answerRequestRef.current = idempotencyKey;
+        result = await apiWrite<AnswerResult>(`/api/learner/practice/sessions/${encodeURIComponent(sessionId)}/answers`, csrfToken, "POST", {
+          questionId: current.id,
+          questionIndex,
+          selectedAnswer: selected,
+          idempotencyKey,
+        });
+      } else {
+        const response = await fetch("/api/practice/check", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ questionId: current.id, selectedAnswer: selected }),
+        });
+        const body = await response.json() as AnswerResult & { error?: string };
+        if (!response.ok) throw new Error(body.error ?? "We couldn’t check your answer just now.");
+        result = body;
+      }
+      setAnswerCorrect(result.isCorrect);
+      setAnswerExplanation(result.explanation ?? null);
+      setSubmitted(true);
+    } catch (reason) {
+      setAnswerError(reason instanceof Error ? reason.message : "We couldn’t save your answer just now. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function tryAgain() {
     setSubmitted(false);
     setSelected(null);
+    setAnswerCorrect(false);
+    setAnswerExplanation(null);
+    setAnswerError(null);
+    answerRequestRef.current = null;
   }
 
-  function nextQuestion() {
+  async function nextQuestion() {
     if (step >= 8) {
-      setComplete(true);
+      if (signedIn) {
+        if (!csrfToken || !sessionId) { setCompletionError("Your session isn’t ready to finish. Please try again."); return; }
+        setCompletionError(null);
+        try {
+          await apiWrite(`/api/learner/practice/sessions/${encodeURIComponent(sessionId)}/complete`, csrfToken, "POST", {});
+          setComplete(true);
+          await refreshSession();
+        } catch (reason) {
+          setCompletionError(reason instanceof Error ? reason.message : "We couldn’t finish saving your session. Please try again.");
+        }
+      } else {
+        setComplete(true);
+      }
       return;
     }
-    setQuestionIndex((index) => Math.min(index + 1, questionSet.length - 1));
+    setQuestionIndex((index) => index + 1);
     setSelected(null);
     setHintVisible(false);
     setSubmitted(false);
-    setElapsed(42);
+    setAnswerCorrect(false);
+    setAnswerExplanation(null);
+    setAnswerError(null);
+    answerRequestRef.current = null;
+    if (signedIn) setElapsed(0);
+    else setGuestElapsed(42);
+  }
+
+  if (status === "loading" || (signedIn && !sessionReady && !sessionStartError)) {
+    return <main className="practice-frame"><p className="practice-loading" aria-live="polite">Getting your practice ready…</p></main>;
+  }
+
+  if (status === "error") {
+    return <main className="practice-frame practice-complete"><section className="completion-content"><h1>We couldn’t check your account</h1><p>Refresh Plus11 and try again before saving an answer.</p><Link className="button button-primary" href="/account">Open account <ArrowRight size={17} aria-hidden="true" /></Link><Link className="quiet-link" href="/">Back to Today</Link></section></main>;
+  }
+
+  if (signedIn && sessionStartError) {
+    return <main className="practice-frame practice-complete"><section className="completion-content"><h1>Practice couldn’t start</h1><p>{sessionStartError}</p><button className="button button-primary" onClick={() => setRetryCount((value) => value + 1)}>Try again <ArrowRight size={17} aria-hidden="true" /></button><Link className="quiet-link" href="/">Back to Today</Link></section></main>;
   }
 
   if (complete) {
@@ -303,14 +245,11 @@ export function PracticeSession() {
           ))}
           <span className="sr-only">Question {step} of 8</span>
         </div>
-        <span className="session-clock"><Clock3 size={17} strokeWidth={2} aria-hidden="true" /> {formatTime(elapsed)}</span>
+        <span className="session-clock"><Clock3 size={17} strokeWidth={2} aria-hidden="true" /> {formatTime(signedIn ? elapsed : guestElapsed)}</span>
       </header>
 
       <div className="practice-body">
-        <div className="practice-context">
-          <span>{current.subject}</span>
-          <span>{step} of 8</span>
-        </div>
+        <div className="practice-context"><span>{current.subject}</span><span>{step} of 8</span></div>
 
         <motion.section
           className="question-card"
@@ -324,19 +263,12 @@ export function PracticeSession() {
           <p>{current.support}</p>
         </motion.section>
 
-        <fieldset className="answer-fieldset" disabled={submitted}>
+        <fieldset className="answer-fieldset" disabled={submitted || isSubmitting}>
           <legend className="sr-only">Choose one answer</legend>
           <div className="answer-list">
             {current.options.map(({ letter, text }) => (
               <label className={`answer-option${selected === letter ? " is-selected" : ""}`} key={letter}>
-                <input
-                  type="radio"
-                  name="practice-answer"
-                  value={letter}
-                  checked={selected === letter}
-                  onChange={() => setSelected(letter)}
-                  aria-label={`${letter}: ${text}`}
-                />
+                <input type="radio" name="practice-answer" value={letter} checked={selected === letter} onChange={() => setSelected(letter)} aria-label={`${letter}: ${text}`} />
                 <span className="answer-letter" aria-hidden="true">{letter}</span>
                 <span className="answer-text">{text}</span>
                 {selected === letter ? <Check className="answer-selected-check" size={17} strokeWidth={2.5} aria-hidden="true" /> : null}
@@ -348,28 +280,24 @@ export function PracticeSession() {
         <div className="practice-bottom">
           <AnimatePresence initial={false}>
             {hintVisible ? (
-              <motion.p
-                key="hint"
-                className="hint-message"
-                initial={reduceMotion ? false : { opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduceMotion ? undefined : { opacity: 0, y: -2 }}
-                transition={{ duration: reduceMotion ? 0 : 0.18 }}
-              >
+              <motion.p key="hint" className="hint-message" initial={reduceMotion ? false : { opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -2 }} transition={{ duration: reduceMotion ? 0 : 0.18 }}>
                 <Lightbulb size={18} aria-hidden="true" /><span><strong>A little hint</strong>{current.hint}</span>
               </motion.p>
             ) : null}
           </AnimatePresence>
 
+          {answerError ? <p className="account-message account-message-error" role="alert">{answerError}</p> : null}
+          {completionError ? <p className="account-message account-message-error" role="alert">{completionError}</p> : null}
+
           {submitted ? (
-            <div className={`answer-feedback${isCorrect ? " feedback-correct" : " feedback-try-again"}`} ref={feedbackRef} tabIndex={-1} role="status" aria-live="polite">
-              <span className="feedback-icon" aria-hidden="true">{isCorrect ? <Check size={18} strokeWidth={2.5} /> : <Lightbulb size={18} />}</span>
+            <div className={`answer-feedback${answerCorrect ? " feedback-correct" : " feedback-try-again"}`} ref={feedbackRef} tabIndex={-1} role="status" aria-live="polite">
+              <span className="feedback-icon" aria-hidden="true">{answerCorrect ? <Check size={18} strokeWidth={2.5} /> : <Lightbulb size={18} />}</span>
               <div className="feedback-copy">
-                <strong>{isCorrect ? "That’s right." : "Not quite yet."}</strong>
-                <p>{isCorrect ? current.explanation : "Have another look at the hint above, then try a different answer."}</p>
+                <strong>{answerCorrect ? "That’s right." : "Not quite yet."}</strong>
+                <p>{answerCorrect ? answerExplanation ?? "That is the right answer." : "Have another look at the hint above, then try a different answer."}</p>
               </div>
-              {isCorrect ? (
-                <button className="button button-primary feedback-action" onClick={nextQuestion}>{step >= 8 ? "Finish" : "Continue"} <ArrowRight size={16} aria-hidden="true" /></button>
+              {answerCorrect ? (
+                <button className="button button-primary feedback-action" onClick={() => void nextQuestion()}>{step >= 8 ? "Finish" : "Continue"} <ArrowRight size={16} aria-hidden="true" /></button>
               ) : (
                 <button className="button button-secondary feedback-action" onClick={tryAgain}>Try again</button>
               )}
@@ -379,8 +307,8 @@ export function PracticeSession() {
               <button className={`button button-secondary hint-button${hintVisible ? " is-open" : ""}`} onClick={() => setHintVisible((visible) => !visible)} aria-expanded={hintVisible}>
                 <Lightbulb size={17} strokeWidth={2} aria-hidden="true" /> {hintVisible ? "Hide hint" : "Hint"}
               </button>
-              <button className="button button-primary check-button" onClick={checkAnswer} disabled={!selected}>
-                Check answer <ArrowRight size={17} aria-hidden="true" />
+              <button className="button button-primary check-button" onClick={() => void checkAnswer()} disabled={!selected || isSubmitting}>
+                {isSubmitting ? <><LoaderCircle className="account-spinner" size={16} aria-hidden="true" /> Checking…</> : <>Check answer <ArrowRight size={17} aria-hidden="true" /></>}
               </button>
             </div>
           )}

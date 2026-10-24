@@ -5,6 +5,7 @@
     { "path": "/learn/:subject", "title": "Subject topics" },
     { "path": "/progress", "title": "Progress" },
     { "path": "/review", "title": "Review" },
-    { "path": "/practice", "title": "Practice" }
+    { "path": "/practice", "title": "Practice" },
+    { "path": "/account", "title": "Account" }
   ]
 }
