@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { OAUTH_STATE_COOKIE, SESSION_COOKIE, cookieOptions, decodeOAuthState, exchangeManusCode, signLearnerSession, verifyOAuthStateCookie } from "@/lib/auth";
-import { ensureLearner } from "@/lib/learner-service";
 
 export const runtime = "nodejs";
 
@@ -30,8 +29,7 @@ export async function GET(request: Request) {
 
   try {
     const user = await exchangeManusCode(code, state.redirectUri);
-    const profile = await ensureLearner(user.openId, user.name);
-    const sessionToken = await signLearnerSession({ openId: user.openId, name: profile.displayName });
+    const sessionToken = await signLearnerSession({ openId: user.openId, name: user.name });
     const response = accountRedirect(publicOrigin, "success");
     response.headers.append("Set-Cookie", `${SESSION_COOKIE}=${encodeURIComponent(sessionToken)}; ${cookieOptions(new URL(publicOrigin))}`);
     response.headers.append("Set-Cookie", `${OAUTH_STATE_COOKIE}=; ${cookieOptions(new URL(publicOrigin), 0)}`);

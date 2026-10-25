@@ -1,15 +1,27 @@
-import { getPool } from "@/lib/db";
-import type { RowDataPacket } from "mysql2/promise";
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const origin = process.env.PLUS_API_BASE_URL ?? "http://127.0.0.1:8001";
   try {
-    const [rows] = await getPool().execute<RowDataPacket[]>("SELECT migration_name FROM plus11_schema_migrations WHERE migration_name = '001_plus11_learning' LIMIT 1");
-    if (!rows[0]) return Response.json({ ok: false }, { status: 503, headers: { "cache-control": "no-store" } });
-    return Response.json({ ok: true }, { headers: { "cache-control": "no-store" } });
+    const response = await fetch(`${origin}/api/ready`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(2500),
+    });
+    if (!response.ok) {
+      return Response.json(
+        { ok: false, service: "plus11" },
+        { status: 503, headers: { "cache-control": "no-store" } },
+      );
+    }
+    return Response.json(
+      { ok: true, service: "plus11" },
+      { headers: { "cache-control": "no-store" } },
+    );
   } catch {
-    return Response.json({ ok: false }, { status: 503, headers: { "cache-control": "no-store" } });
+    return Response.json(
+      { ok: false, service: "plus11" },
+      { status: 503, headers: { "cache-control": "no-store" } },
+    );
   }
 }

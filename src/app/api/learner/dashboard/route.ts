@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const auth = await authenticated(request);
   if ("response" in auth) return auth.response;
   try {
-    return json(await getDashboard(auth.result.session.openId));
+    return json(await getDashboard(auth.result.token));
   } catch (error) {
     return handleApiError(error, "We couldn’t load your learning today. Please try again.");
   }

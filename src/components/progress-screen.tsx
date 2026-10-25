@@ -11,6 +11,7 @@ import { subjects, weekDays } from "@/lib/data";
 type ProgressData = {
   overall: number;
   totalAttempts: number;
+  hasHistory: boolean;
   mastery: { id: string; name: string; mastery: number; attempts: number }[];
   minutesByDay: { date: string; label: string; state: "complete" | "today" | "upcoming" | "missed"; minutes: number }[];
   practiceDays: number;
@@ -74,6 +75,7 @@ export function ProgressScreen() {
           </div>
           <span className="overall-stat"><strong>{overall}%</strong><span>overall</span></span>
         </div>
+        {signedIn && !progress.hasHistory ? <p className="empty-progress-note" role="status">Your saved answers will appear here as you practise reviewed questions.</p> : null}
         <div className="progress-subject-list">
           {mastery.map(({ id, name, mastery: value, attempts }) => (
             <Link className="progress-subject-row" href={`/learn/${id}`} key={id} aria-label={`${name}: ${value}%${signedIn ? ` from ${attempts} answers` : " mastery"}`}>

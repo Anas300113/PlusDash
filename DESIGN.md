@@ -2,7 +2,7 @@
 
 ## Authority
 
-The user-provided `/home/ubuntu/upload/Plus11+AppDesign.pdf` is the source of truth for visual identity and the core Today, Learn, and Practice screen composition. Do not replace it with generic education-app conventions. The approved work is an Operate surface: prioritize legibility, predictable task completion, and restrained polish.
+The user-provided `Plus11+AppDesign.pdf` is the source of truth for visual identity and the core Today, Learn, and Practice screen composition; its source file is supplied separately and is not packaged with the application. Do not replace it with generic education-app conventions. The approved work is an Operate surface: prioritize legibility, predictable task completion, and restrained polish.
 
 ## Design movement and principles
 

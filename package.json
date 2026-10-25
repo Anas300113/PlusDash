@@ -4,18 +4,21 @@
   "private": true,
   "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "dev": "next dev --hostname 0.0.0.0 --port 3000",
+    "dev": "python3 scripts/supervise.py",
     "build": "next build",
-    "start": "next start --hostname 0.0.0.0",
+    "start": "python3 scripts/supervise.py --production",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "db:migrate": "node scripts/migrate.mjs"
+    "setup:python": "python3 -m venv .venv && .venv/bin/pip install -r requirements.txt",
+    "api:compile": ".venv/bin/python -m compileall -q src",
+    "api:test": ".venv/bin/python -m pytest tests/",
+    "api:migrate": ".venv/bin/python -m src.core.migrate",
+    "db:migrate": ".venv/bin/python -m src.core.migrate"
   },
   "dependencies": {
     "framer-motion": "14.6.0",
     "jose": "6.2.13",
     "lucide-react": "1.61.0",
-    "mysql2": "3.24.6",
     "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1"

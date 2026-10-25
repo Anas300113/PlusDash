@@ -28,6 +28,8 @@ The app is designed for learners to use on mobile and desktop for short practice
 
 The original frontend-only scope has been extended by the user's follow-up request to add an account area and make learning data work with a backend. The intended default identity provider is Manus OAuth because no alternative was requested. A single learner's profile and learning activity should be isolated and saved across sessions; the static question/topic catalogue remains product content. Logged-out learners may browse demo/sample figures, but those figures must never be presented as the signed-in learner's real history.
 
+The user selected the existing `Anas300113/Plus` FastAPI backend as the authoritative learning engine and asked to deploy it alongside the frontend. The Next.js app remains the UI and same-origin BFF; FastAPI owns authenticated practice, progress, mastery, and review behavior. The existing question bank's approval rules are authoritative, and an empty approved catalogue must remain an honest empty state rather than falling back to demo questions for account-backed learners.
+
 ## Capabilities and Constraints
 
 - Implement the complete interactive frontend for Today, Learn, Progress, Review, subject/topic selection, and focused practice.
@@ -48,10 +50,13 @@ The product name is Plus11. The user-provided `Plus11+AppDesign.pdf` is the bind
 
 ## Evidence on Hand
 
-- Supplied visual/product reference: `/home/ubuntu/upload/Plus11+AppDesign.pdf` (four pages).
+- Supplied visual/product reference: `Plus11+AppDesign.pdf` (four pages; the source PDF is supplied separately and is not packaged with the application).
 - The PDF contains sample Today, Learn, and question screens and the palette/type/icon/tracker rules.
 - Approved blueprint supplies Progress and Review screen scope.
 - User follow-up (2026-10-24): “Can you add an accounts section and make sure everything with smoothly intergrate with the backend and will work”.
+- User follow-up (2026-10-24): “Use FastAPI; deploy it alongside the frontend”.
+- User-selected existing backend repository: `https://github.com/Anas300113/Plus`.
+- User-selected dashboard delivery repository: `https://github.com/Anas300113/PlusDash` (public; no branches existed when checked, so the initial push creates `main`). This does not change the Manus-managed canonical repository.
 - No validated product analytics, customer testimonials, real learner records, or performance claims were supplied. Use sample values as illustrative UI content only.
 
 ## Product Principles

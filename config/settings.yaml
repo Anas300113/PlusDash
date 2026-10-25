@@ -1,0 +1,23 @@
+app:
+  name: eleven-plus-platform
+  environment: development
+
+database:
+  url: sqlite:///./elevenplus.db
+
+storage:
+  assets_dir: ./data/assets
+  sources_dir: ./data/sources
+  fixtures_dir: ./data/fixtures
+
+pipeline:
+  version: "0.1.0"
+  batch_size: 50
+
+review:
+  auto_approve_high_confidence: false
+  min_confidence_for_review: 0.0
+
+api:
+  host: 127.0.0.1
+  port: 8000

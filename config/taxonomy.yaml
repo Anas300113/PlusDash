@@ -1,0 +1,326 @@
+subjects:
+  - id: maths
+    name: Maths
+    display_order: 1
+    topics:
+      - id: maths-arithmetic
+        name: Arithmetic
+        description: Addition, subtraction, multiplication, division, BIDMAS
+        display_order: 1
+        skills:
+          - { id: maths-arith-add, name: Column addition }
+          - { id: maths-arith-sub, name: Column subtraction }
+          - { id: maths-arith-mul, name: Long multiplication }
+          - { id: maths-arith-div, name: Long division }
+          - { id: maths-arith-bidmas, name: Order of operations (BIDMAS) }
+      - id: maths-number
+        name: Number
+        description: Place value, factors, multiples, primes
+        display_order: 2
+        skills:
+          - { id: maths-num-place, name: Place value }
+          - { id: maths-num-factors, name: Factors and multiples }
+          - { id: maths-num-primes, name: Primes }
+      - id: maths-fractions
+        name: Fractions
+        description: Simplifying, adding, fractions of amounts
+        display_order: 3
+        skills:
+          - { id: maths-frac-simplify, name: Simplifying fractions }
+          - { id: maths-frac-add, name: Adding fractions }
+          - { id: maths-frac-of, name: Fractions of amounts }
+      - id: maths-decimals
+        name: Decimals
+        display_order: 4
+        skills:
+          - { id: maths-dec-basic, name: Decimal operations }
+      - id: maths-percentages
+        name: Percentages
+        display_order: 5
+        skills:
+          - { id: maths-pct-of, name: Percentages of amounts }
+          - { id: maths-pct-change, name: Percentage change }
+      - id: maths-ratio
+        name: Ratio
+        display_order: 6
+        skills:
+          - { id: maths-ratio-basic, name: Ratio problems }
+      - id: maths-proportion
+        name: Proportion
+        display_order: 7
+        skills:
+          - { id: maths-prop-basic, name: Direct proportion }
+      - id: maths-algebra
+        name: Algebra
+        display_order: 8
+        skills:
+          - { id: maths-alg-equations, name: Simple equations }
+          - { id: maths-alg-expressions, name: Evaluating expressions }
+      - id: maths-sequences
+        name: Sequences
+        display_order: 9
+        skills:
+          - { id: maths-seq-arith, name: Arithmetic sequences }
+          - { id: maths-seq-rule, name: Finding the rule }
+      - id: maths-geometry
+        name: Geometry
+        display_order: 10
+        skills:
+          - { id: maths-geo-angles, name: Angles }
+          - { id: maths-geo-area, name: Area and perimeter }
+          - { id: maths-geo-3d, name: 3D shapes }
+      - id: maths-measurement
+        name: Measurement
+        display_order: 11
+        skills:
+          - { id: maths-meas-units, name: Unit conversion }
+      - id: maths-time
+        name: Time
+        display_order: 12
+        skills:
+          - { id: maths-time-basic, name: Time calculations }
+      - id: maths-money
+        name: Money
+        display_order: 13
+        skills:
+          - { id: maths-money-basic, name: Money problems }
+      - id: maths-data
+        name: Data
+        display_order: 14
+        skills:
+          - { id: maths-data-mean, name: Mean, median, mode }
+      - id: maths-graphs
+        name: Graphs
+        display_order: 15
+        skills:
+          - { id: maths-graphs-basic, name: Reading graphs }
+      - id: maths-tables
+        name: Tables
+        display_order: 16
+        skills:
+          - { id: maths-tables-basic, name: Reading tables }
+      - id: maths-problem-solving
+        name: Problem Solving
+        display_order: 17
+        skills:
+          - { id: maths-ps-multistep, name: Multi-step word problems }
+
+  - id: english
+    name: English
+    display_order: 2
+    topics:
+      - id: eng-comprehension
+        name: Comprehension
+        display_order: 1
+        skills:
+          - { id: eng-comp-literal, name: Literal retrieval }
+          - { id: eng-comp-inference, name: Inference }
+          - { id: eng-comp-vocab, name: Vocabulary in context }
+      - id: eng-grammar
+        name: Grammar
+        display_order: 2
+        skills:
+          - { id: eng-gram-pos, name: Parts of speech }
+          - { id: eng-gram-sentences, name: Sentence types }
+          - { id: eng-gram-agreement, name: Subject-verb agreement }
+      - id: eng-punctuation
+        name: Punctuation
+        display_order: 3
+        skills:
+          - { id: eng-punct-commas, name: Commas }
+          - { id: eng-punct-apos, name: Apostrophes }
+      - id: eng-spelling
+        name: Spelling
+        display_order: 4
+        skills:
+          - { id: eng-spell-common, name: Commonly misspelled words }
+      - id: eng-vocabulary
+        name: Vocabulary
+        display_order: 5
+        skills:
+          - { id: eng-vocab-syn, name: Synonyms }
+          - { id: eng-vocab-ant, name: Antonyms }
+      - id: eng-sentence-structure
+        name: Sentence Structure
+        display_order: 6
+        skills:
+          - { id: eng-sent-basic, name: Simple, compound, complex }
+      - id: eng-technical-english
+        name: Technical English
+        display_order: 7
+        skills:
+          - { id: eng-tech-basic, name: Technical terms }
+      - id: eng-creative-writing
+        name: Creative Writing
+        display_order: 8
+        skills:
+          - { id: eng-cw-basic, name: Creative writing prompts }
+      - id: eng-cloze
+        name: Cloze
+        display_order: 9
+        skills:
+          - { id: eng-cloze-basic, name: Fill in the blanks }
+
+  - id: verbal_reasoning
+    name: Verbal Reasoning
+    display_order: 3
+    topics:
+      - id: vr-synonyms
+        name: Synonyms
+        display_order: 1
+        skills:
+          - { id: vr-syn-basic, name: Closest in meaning }
+      - id: vr-antonyms
+        name: Antonyms
+        display_order: 2
+        skills:
+          - { id: vr-ant-basic, name: Most opposite in meaning }
+      - id: vr-analogies
+        name: Analogies
+        display_order: 3
+        skills:
+          - { id: vr-ana-basic, name: Word relationships }
+      - id: vr-codes
+        name: Codes
+        display_order: 4
+        skills:
+          - { id: vr-code-letter, name: Letter codes }
+          - { id: vr-code-number, name: Number codes }
+      - id: vr-letter-sequences
+        name: Letter Sequences
+        display_order: 5
+        skills:
+          - { id: vr-lseq-basic, name: Letter patterns }
+      - id: vr-number-sequences
+        name: Number Sequences
+        display_order: 6
+        skills:
+          - { id: vr-nseq-basic, name: Number patterns }
+      - id: vr-hidden-words
+        name: Hidden Words
+        display_order: 7
+        skills:
+          - { id: vr-hidden-basic, name: Hidden word finding }
+      - id: vr-word-relationships
+        name: Word Relationships
+        display_order: 8
+        skills:
+          - { id: vr-rel-basic, name: Relationship classification }
+      - id: vr-classification
+        name: Classification
+        display_order: 9
+        skills:
+          - { id: vr-class-basic, name: Grouping words }
+      - id: vr-odd-one-out
+        name: Odd One Out
+        display_order: 10
+        skills:
+          - { id: vr-odd-basic, name: Which does not belong }
+      - id: vr-word-construction
+        name: Word Construction
+        display_order: 11
+        skills:
+          - { id: vr-wc-compound, name: Compound words }
+          - { id: vr-wc-anagram, name: Anagrams }
+
+  - id: non_verbal_reasoning
+    name: Non-Verbal Reasoning
+    display_order: 4
+    topics:
+      - id: nvr-shape-sequences
+        name: Shape Sequences
+        display_order: 1
+        skills:
+          - { id: nvr-seq-series, name: Series completion }
+      - id: nvr-matrices
+        name: Matrices
+        display_order: 2
+        skills:
+          - { id: nvr-mat-basic, name: Grid completion }
+      - id: nvr-analogies
+        name: Analogies
+        display_order: 3
+        skills:
+          - { id: nvr-ana-basic, name: Shape relationships }
+      - id: nvr-transformations
+        name: Transformations
+        display_order: 4
+        skills:
+          - { id: nvr-trans-basic, name: Combined transforms }
+      - id: nvr-rotations
+        name: Rotations
+        display_order: 5
+        skills:
+          - { id: nvr-rot-basic, name: Rotation reasoning }
+      - id: nvr-reflections
+        name: Reflections
+        display_order: 6
+        skills:
+          - { id: nvr-ref-basic, name: Mirror reasoning }
+      - id: nvr-odd-one-out
+        name: Odd One Out
+        display_order: 7
+        skills:
+          - { id: nvr-odd-basic, name: Which shape does not belong }
+      - id: nvr-spatial-reasoning
+        name: Spatial Reasoning
+        display_order: 8
+        skills:
+          - { id: nvr-spatial-basic, name: 2D spatial }
+      - id: nvr-paper-folding
+        name: Paper Folding
+        display_order: 9
+        skills:
+          - { id: nvr-fold-basic, name: Punch and unfold }
+      - id: nvr-cube-nets
+        name: Cube Nets
+        display_order: 10
+        skills:
+          - { id: nvr-net-basic, name: Net to cube }
+      - id: nvr-3d-reasoning
+        name: 3D Reasoning
+        display_order: 11
+        skills:
+          - { id: nvr-3d-basic, name: 3D shapes and views }
+
+question_types:
+  - id: mcq
+    name: Multiple Choice
+    description: Select one answer from a list of options
+    requires_options: true
+  - id: numeric
+    name: Numeric Answer
+    description: Enter a number
+    requires_options: false
+  - id: free_text
+    name: Free Text
+    description: Short written answer
+    requires_options: false
+  - id: multi_select
+    name: Multi-Select
+    description: Select all correct options
+    requires_options: true
+  - id: matching
+    name: Matching
+    description: Match pairs of items
+    requires_options: true
+  - id: ordering
+    name: Ordering
+    description: Order items into the correct sequence
+    requires_options: true
+  - id: cloze
+    name: Cloze
+    description: Fill in the blanks in a passage
+    requires_options: false
+  - id: image_choice
+    name: Image Choice
+    description: Select one image from a set of image options
+    requires_options: true
+  - id: creative_writing
+    name: Creative Writing
+    description: Extended written response to a prompt
+    requires_options: false
+  - id: unknown_custom
+    name: Unknown / Custom
+    description: Format not yet classified
+    requires_options: false

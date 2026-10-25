@@ -26,6 +26,7 @@ type DashboardData = {
   completedCount: number;
   dueCount: number;
   continueHref: string;
+  hasActiveSession: boolean;
   minutesByDay: { date: string; label: string; state: "complete" | "today" | "upcoming" | "missed"; minutes: number }[];
 };
 
@@ -72,6 +73,9 @@ export function TodayDashboard() {
   })) : demoPlan;
   const completedCount = isLearner ? dashboard.completedCount : 1;
   const days = isLearner ? dashboard.minutesByDay : weekDays.map((day) => ({ ...day, date: day.label, minutes: 0 }));
+  const continueLabel = isLearner && dashboard.continueHref === "/learn"
+    ? "Choose a topic"
+    : isLearner && !dashboard.hasActiveSession ? "Start practice" : "Continue practice";
 
   return (
     <div className="page-stack today-page">
@@ -92,7 +96,7 @@ export function TodayDashboard() {
         <div className="continue-copy">
           <p className="continue-message">{remaining > 0 ? <>Nearly there. <span>{remaining} minutes</span> to go.</> : "Daily goal reached. Nice work."}</p>
           <Link className="button button-primary" href={isLearner ? dashboard.continueHref : "/practice?subject=verbal-reasoning&topic=odd-one-out"}>
-            Continue practice <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
+            {continueLabel} <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
           </Link>
         </div>
         <Image className="owl-peek" src="/plus11-mark.svg" alt="" aria-hidden="true" width={38} height={38} />
@@ -101,7 +105,7 @@ export function TodayDashboard() {
       <section className="plan-section" aria-labelledby="plan-heading">
         <div className="section-heading-row">
           <h2 id="plan-heading" className="section-title">Today’s plan</h2>
-          <span className="section-progress">{completedCount} of 3 done</span>
+          <span className="section-progress">{completedCount} of {plan.length} done</span>
         </div>
         <div className="plan-list">
           {plan.map(({ title, detail, href, status: planStatus, label }, index) => {

@@ -1,0 +1,77 @@
+exam_boards:
+  - id: gl
+    name: GL Assessment
+    description: Multiple choice papers, most common UK 11+ provider
+    regions_supported: [kent, buckinghamshire, birmingham, lincolnshire, warwickshire, medway, northern_ireland_gl, hertfordshire, london]
+  - id: cem
+    name: CEM (Cambridge)
+    description: Integrated timed papers (formerly Durham CEM)
+    regions_supported: [berkshire, bexley, gloucestershire]
+  - id: csse
+    name: CSSE
+    description: Essex consortium, Maths and English only
+    regions_supported: [essex]
+  - id: aqe
+    name: AQE
+    description: Northern Ireland transfer test provider
+    regions_supported: [northern_ireland]
+  - id: school-set
+    name: School-set
+    description: Individual school written papers
+    regions_supported: [london, sutton, kingston]
+  - id: mixed
+    name: Mixed
+    description: Mixed or unspecified provider
+    regions_supported: []
+
+regions:
+  - id: kent
+    name: Kent
+    exam_boards: [gl]
+    subjects: [maths, verbal_reasoning, non_verbal_reasoning]
+    test_format: Three papers - English, Maths, Reasoning
+    notable_schools: [The Judd School, Tonbridge Grammar School, Maidstone Grammar School]
+  - id: buckinghamshire
+    name: Buckinghamshire
+    exam_boards: [gl]
+    subjects: [maths, verbal_reasoning, non_verbal_reasoning]
+    test_format: Secondary Transfer Test - two papers
+    notable_schools: [Royal Grammar School High Wycombe, Aylesbury High School]
+  - id: essex
+    name: Essex
+    exam_boards: [csse]
+    subjects: [maths, english]
+    test_format: CSSE English and Maths papers
+    notable_schools: [Colchester Royal Grammar School, Chelmsford County High School]
+  - id: london
+    name: London
+    exam_boards: [gl, school-set]
+    subjects: [maths, english, verbal_reasoning, non_verbal_reasoning]
+    test_format: Varies by school - GL or school-set papers
+    notable_schools: [Tiffin Boys School, Tiffin Girls School, Henrietta Barnett School]
+  - id: birmingham
+    name: Birmingham
+    exam_boards: [gl]
+    subjects: [maths, english, verbal_reasoning, non_verbal_reasoning]
+    test_format: GL papers via West Midlands consortium
+    notable_schools: [King Edward VI schools]
+  - id: northern_ireland
+    name: Northern Ireland
+    exam_boards: [aqe, gl]
+    subjects: [maths, english]
+    test_format: AQE or GL transfer tests
+    notable_schools: [Belfast Royal Academy, Methodist College Belfast]
+
+schools:
+  - id: tiffin-girls
+    name: The Tiffin Girls' School
+    region: london
+    area: Kingston
+    exam_boards: [school-set]
+    subjects: [english, maths]
+  - id: judd
+    name: The Judd School
+    region: kent
+    area: Tonbridge
+    exam_boards: [gl]
+    subjects: [maths, verbal_reasoning, non_verbal_reasoning]

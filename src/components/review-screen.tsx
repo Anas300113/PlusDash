@@ -7,9 +7,9 @@ import { useSession } from "@/components/session-provider";
 import { apiGet, apiWrite } from "@/lib/client-api";
 import { reviewCards } from "@/lib/data";
 
-type Card = { cardId: string; topic: string; prompt: string; answer: string };
+type Card = { cardId: string; subjectId?: string; topicId?: string; topic: string; prompt: string; answer?: string; explanation?: string };
 type DueReviewResponse = { cards: Card[]; dueCount: number };
-const demoCards = reviewCards.map((card, index) => ({ ...card, cardId: `sample-${index + 1}` }));
+const demoCards: Card[] = reviewCards.map((card, index) => ({ ...card, cardId: `sample-${index + 1}` }));
 
 export function ReviewScreen() {
   const { status, csrfToken, error: sessionError, refresh: refreshSession } = useSession();
@@ -21,7 +21,9 @@ export function ReviewScreen() {
   const [current, setCurrent] = useState(0);
   const [revisitCount, setRevisitCount] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [revealing, setRevealing] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [revealed, setRevealed] = useState<Record<string, Pick<Card, "answer" | "explanation">>>({});
   const eventRef = useRef<{ cardId: string; eventId: string } | null>(null);
   const requestKey = status === "authenticated" && csrfToken ? `${csrfToken}:${reloadKey}` : null;
 
@@ -49,7 +51,29 @@ export function ReviewScreen() {
   const dueCount = list.length;
   const estimate = dueCount ? Math.max(1, Math.round(dueCount * 40 / 60)) : 0;
   const finished = current >= dueCount;
-  const card = list[current];
+  const listedCard = list[current];
+  const card = listedCard ? { ...listedCard, ...revealed[listedCard.cardId] } : undefined;
+
+  async function revealAnswer() {
+    if (!card) return;
+    setActionError(null);
+    if (signedIn) {
+      if (!csrfToken) { setActionError("Refresh your account before revealing this answer."); return; }
+      setRevealing(true);
+      try {
+        const result = await apiWrite<Pick<Card, "answer" | "explanation">>(
+          `/api/learner/review/${encodeURIComponent(card.cardId)}/reveal`, csrfToken, "POST", {},
+        );
+        setRevealed((items) => ({ ...items, [card.cardId]: result }));
+      } catch (reason) {
+        setActionError(reason instanceof Error ? reason.message : "We couldn’t reveal this answer just now. Please try again.");
+        setRevealing(false);
+        return;
+      }
+      setRevealing(false);
+    }
+    setShowAnswer(true);
+  }
 
   async function recordOutcome(outcome: "got-it" | "again") {
     if (!card) return;
@@ -96,13 +120,7 @@ export function ReviewScreen() {
             <span className="review-count" aria-label={`${dueCount} cards`}>{dueCount}</span>
           </section>
           <div className="review-queue" aria-label="Topics in your review queue">
-            {list.slice(0, 4).map((item, index) => (
-              <div className="review-queue-row" key={item.cardId}>
-                <span className="queue-index">{String(index + 1).padStart(2, "0")}</span>
-                <span>{item.topic}</span>
-                <span className="queue-dot" aria-hidden="true" />
-              </div>
-            ))}
+            {list.slice(0, 4).map((item, index) => <div className="review-queue-row" key={item.cardId}><span className="queue-index">{String(index + 1).padStart(2, "0")}</span><span>{item.topic}</span><span className="queue-dot" aria-hidden="true" /></div>)}
             {dueCount > 4 ? <p className="queue-more">Plus {dueCount - 4} more {dueCount - 4 === 1 ? "card" : "cards"}</p> : null}
           </div>
           <button className="button button-primary review-start" onClick={() => { setCurrent(0); setStarted(true); }}>
@@ -120,17 +138,15 @@ export function ReviewScreen() {
       ) : card ? (
         <section className="review-session" aria-labelledby="review-card-title">
           <div className="review-session-meta"><span>Card {current + 1} of {dueCount}</span><span className="review-topic-tag">{card.topic}</span></div>
-          <div className="review-session-progress" role="progressbar" aria-label="Review progress" aria-valuemin={0} aria-valuemax={dueCount} aria-valuenow={current}>
-            <span style={{ width: `${current / dueCount * 100}%` }} />
-          </div>
+          <div className="review-session-progress" role="progressbar" aria-label="Review progress" aria-valuemin={0} aria-valuemax={dueCount} aria-valuenow={current}><span style={{ width: `${current / dueCount * 100}%` }} /></div>
           <div className="review-flashcard">
             <span className="card-side-label">Have a think</span>
             <h2 id="review-card-title">{card.prompt}</h2>
-            {showAnswer ? <div className="review-answer" aria-live="polite"><span className="card-side-label">A helpful answer</span><p>{card.answer}</p></div> : null}
+            {showAnswer ? <div className="review-answer" aria-live="polite"><span className="card-side-label">A helpful answer</span>{card.answer ? <p>{card.answer}</p> : null}{card.explanation ? <p>{card.explanation}</p> : null}</div> : null}
           </div>
           {actionError ? <p className="account-message account-message-error" role="alert">{actionError}</p> : null}
           {!showAnswer ? (
-            <button className="button button-primary review-reveal" onClick={() => setShowAnswer(true)}>Show answer <ArrowRight size={17} aria-hidden="true" /></button>
+            <button className="button button-primary review-reveal" disabled={revealing} onClick={() => void revealAnswer()}>{revealing ? <><LoaderCircle className="account-spinner" size={16} aria-hidden="true" /> Revealing…</> : <>Show answer <ArrowRight size={17} aria-hidden="true" /></>}</button>
           ) : (
             <div className="review-actions">
               <button className="button button-secondary" disabled={saving} onClick={() => void recordOutcome("again")}><RotateCcw size={16} aria-hidden="true" /> {saving ? "Saving…" : "Need another look"}</button>

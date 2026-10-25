@@ -157,6 +157,8 @@ button { color: inherit; }
 .topic-list { display: flex; flex-direction: column; gap: 8px; }
 .topic-row { min-height: 70px; display: flex; align-items: center; gap: 14px; padding: 10px 13px; border: var(--line-width) solid var(--ink); border-radius: 14px; background: var(--page); transition: background-color 160ms ease, transform 160ms ease; }
 .topic-row:hover { background: var(--paper); transform: translateY(-1px); }
+.topic-row-disabled { color: var(--pencil); background: var(--paper); cursor: not-allowed; }
+.topic-row-disabled .topic-row-copy > span { color: var(--pencil); }
 .topic-number { width: 34px; color: var(--pencil); font: 400 20px/1 var(--font-display); font-variant-numeric: tabular-nums; }
 .topic-row-copy { display: flex; flex-direction: column; gap: 3px; flex: 1; }
 .topic-row-copy strong { font-size: 15px; }
@@ -168,6 +170,7 @@ button { color: inherit; }
 .progress-overview { padding: 18px 18px 17px; border: var(--line-width) solid var(--ink); border-radius: var(--radius-card); background: var(--page); }
 .progress-overview-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--muted-line); }
 .progress-overview-head p { margin: 4px 0 0; color: var(--pencil); font-size: 13px; }
+.empty-progress-note { margin: 0 0 13px; padding: 10px 12px; border-left: 3px solid var(--highlighter); color: var(--pencil); background: var(--paper); font-size: 13px; line-height: 1.45; }
 .overall-stat { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
 .overall-stat strong { font: 400 31px/1 var(--font-display); font-variant-numeric: tabular-nums; }
 .overall-stat span { color: var(--pencil); font-size: 12px; }

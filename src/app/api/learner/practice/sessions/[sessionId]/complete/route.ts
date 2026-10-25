@@ -10,7 +10,7 @@ export async function POST(request: Request, context: { params: Promise<{ sessio
   try {
     verifyMutation(request, auth.result.token);
     const { sessionId } = await context.params;
-    return json(await completePracticeSession(auth.result.session.openId, sessionId));
+    return json(await completePracticeSession(auth.result.token, sessionId));
   } catch (error) {
     return handleApiError(error, "We couldn’t finish your practice session just now. Please try again.");
   }
