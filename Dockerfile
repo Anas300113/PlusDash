@@ -1,4 +1,6 @@
-FROM node:22-bookworm-slim AS node-base
+# Use Docker Official Images from ECR Public to avoid Docker Hub anonymous-pull limits.
+# Keep Node and Python on the same Debian suite for compatible system libraries.
+FROM public.ecr.aws/docker/library/node:22.23.3-trixie-slim AS node-base
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@11.25.0 --activate
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -12,13 +14,13 @@ COPY --from=node-deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm build
 
-FROM python:3.12-bookworm-slim AS python-deps
+FROM public.ecr.aws/docker/library/python:3.12.15-slim-trixie AS python-deps
 WORKDIR /build
 COPY requirements-runtime.lock ./requirements-runtime.lock
 RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir -r requirements-runtime.lock
 
-FROM python:3.12-bookworm-slim AS runner
+FROM public.ecr.aws/docker/library/python:3.12.15-slim-trixie AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
